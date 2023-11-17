@@ -1,0 +1,61 @@
+*{
+    padding: 0;
+    margin : 0;
+}
+
+#navbar-main{
+    display: flex;
+    background-color: #282828;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#profile{
+    margin: 10%;
+    display: flex;
+    width: 50px; /* Adjust the size as needed */
+    height: 50px; /* Adjust the size as needed */
+    border-radius: 50%; /* Makes the container circular */
+    overflow: hidden; /* Clips the image to the circle */
+}
+
+#greet{
+    
+    color: antiquewhite;
+}
+
+.styling{
+    color: bisque;
+    font-style: oblique;
+    font-weight: 700;
+
+}
+
+#innerhalf{
+    display: flex;
+    width: 60%;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+
+#innerhalf2{
+    display: flex;
+    width: 20%;
+    align-items: center;
+    justify-content: space-evenly;
+    justify-content: end;
+    align-items: center;
+    padding-right: 3%;
+}
+
+#innerhlf2{
+    display: flex;
+    align-items: center;
+}
+
+#innerhlf2 p{
+    color: red;
+    font-family: cursive;
+}
+
