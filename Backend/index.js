@@ -5,6 +5,7 @@ var jwt = require("jsonwebtoken");
 const { auth } = require("./middleware");
 let USER_ID_COUNTER = 1;
 const USERS = [];
+const mongoose = require('mongoose');
 const JWT_SECRET = "secret";
 const bodyParser = require("body-parser");
 var jsonParser = bodyParser.json();
@@ -12,6 +13,12 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const cors = require("cors");
 app.use(cors());
 app.use(jsonParser);
+
+mongoose.connect('mongodb://127.0.0.1:27017/meetcodedb')
+.then(() => console.log('Connected to MongoDB') )
+.catch(error => {
+  console.error('Error:', error);
+});
 
 
 const PROBLEMS = [
@@ -169,7 +176,22 @@ const PROBLEMS = [
   },
 ];
 
-const SUBMISSIONS = [];
+
+
+// Define the schema
+const submissionSchema = new mongoose.Schema({
+  submission: String,
+  probId: Number,
+  userId: String,
+  status: String,
+  subtime: String
+});
+
+// Create the model
+const SUBMISSION = mongoose.model('Submissions', submissionSchema);
+
+
+
 
 app.get("/", (req, res) => {
   console.log[USERS],
@@ -210,11 +232,15 @@ app.get("/me", auth, (req, res) => {
   res.json({ email: user.email, id: user.id });
 });
 
-app.get("/submissions/:pid", auth, (req, res) => {
+app.get("/submissions/:pid", auth, async (req, res) => {
   const problemId = req.params.pid;
-  const filteredsubmissions = SUBMISSIONS.filter(
-    (x) => x.probId === problemId && x.userId === req.userId
-  );
+  var filteredsubmissions = [];
+  try{
+    filteredsubmissions= await SUBMISSION.find({ userId: req.userId, probId: problemId });
+  } catch (error) {
+    console.error('Error while fetching submissions:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
   res.json({
     filteredsubmissions,
   });
@@ -225,32 +251,27 @@ app.post("/submission", auth, (req, res) => {
   const problemId = req.body.probId;
   const submission = req.body.submission;
   const time = req.body.subtime
+  var submissionStatus = isCorrect ? "AC" : "WA";
 
-  if (isCorrect) {
-    SUBMISSIONS.push({
-      submission : submission,
-      probId : problemId,
-      userId: req.userId,
-      status: "AC",
-      subtime : time,
-    });
-    return res.json({
-      status: "AC",
-    });
-    
-  } else {
-    SUBMISSIONS.push({
-      submission : submission,
-      probId : problemId,
-      userId: req.userId,
-      status: "WA",
-      subtime : time,
-    });
-    return res.json({
-      status: "WA",
-    });
+  var newSubmisson = new SUBMISSION({
+    submission : submission,
+    probId : problemId,
+    userId: req.userId,
+    status: submissionStatus,
+    subtime : time,
+  });;
+
+  try{
+    newSubmisson.save();
+  }
+  catch (error) {
+    console.error('Error while saving submission in db:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 
+  return res.json({
+    status: submissionStatus,
+  });
 
   
 });
