@@ -4,7 +4,7 @@ const port = 3000;
 var jwt = require("jsonwebtoken");
 const { auth } = require("./middleware");
 let USER_ID_COUNTER = 1;
-const USERS = [];
+// const USERS = [];
 const mongoose = require('mongoose');
 const JWT_SECRET = "secret";
 const bodyParser = require("body-parser");
@@ -13,6 +13,8 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const cors = require("cors");
 app.use(cors());
 app.use(jsonParser);
+const { v4: uniqueid } = require('uuid');
+
 
 mongoose.connect('mongodb://127.0.0.1:27017/meetcodedb')
 .then(() => console.log('Connected to MongoDB') )
@@ -177,6 +179,17 @@ const PROBLEMS = [
 ];
 
 
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  userId: {
+    type: String,
+    unique: true,
+    index: true,
+    required: true,
+    default: uniqueid
+  } 
+})
 
 // Define the schema
 const submissionSchema = new mongoose.Schema({
@@ -189,12 +202,11 @@ const submissionSchema = new mongoose.Schema({
 
 // Create the model
 const SUBMISSION = mongoose.model('Submissions', submissionSchema);
-
+const USER = mongoose.model('Users',userSchema);
 
 
 
 app.get("/", (req, res) => {
-  console.log[USERS],
   res.json({
     msg: "hello world",
   });
@@ -227,8 +239,8 @@ app.get("/problem/:id", (req, res) => {
   });
 });
 
-app.get("/me", auth, (req, res) => {
-  const user = USERS.find((x) => x.id === req.userId);
+app.get("/me", auth, async  (req, res) => {
+  const user =  await USER.findOne({ userId: req.userId });
   res.json({ email: user.email, id: user.id });
 });
 
@@ -236,7 +248,7 @@ app.get("/submissions/:pid", auth, async (req, res) => {
   const problemId = req.params.pid;
   var filteredsubmissions = [];
   try{
-    filteredsubmissions= await SUBMISSION.find({ userId: req.userId, probId: problemId });
+    filteredsubmissions = await SUBMISSION.find({ userId: req.userId, probId: problemId });
   } catch (error) {
     console.error('Error while fetching submissions:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -250,7 +262,7 @@ app.post("/submission", auth, (req, res) => {
   const isCorrect = Math.random() < 0.5;
   const problemId = req.body.probId;
   const submission = req.body.submission;
-  const time = req.body.subtime
+  const time = req.body.subtime;
   var submissionStatus = isCorrect ? "AC" : "WA";
 
   var newSubmisson = new SUBMISSION({
@@ -276,28 +288,35 @@ app.post("/submission", auth, (req, res) => {
   
 });
 
-app.post("/signup", (req, res) => {
-  
-  const email = req.body.email;
+app.post("/signup", async (req, res) => {
+
+  const curremail = req.body.email;
   const password = req.body.password;
-  if (USERS.find((x) => x.email === email)) {
-    return res.status(403).json({ msg: "Email already exists" });
+
+  try {
+    // Check if the email already exists
+    const existingUser = await USER.findOne({ email:curremail });
+
+    if (existingUser) {
+      return res.status(403).json({ msg: 'Email already exists' });
+    }
+
+    // Create a new user
+    const newUser = new USER({ email : curremail, password : password });
+    await newUser.save();
+
+    return res.json({ msg: 'Success' });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    return res.status(500).json({ msg: 'Internal Server Error' });
   }
 
-  USERS.push({
-    email,
-    password,
-    id: USER_ID_COUNTER++,
-  });
-  return res.json({
-    msg: "Success",
-  });
 });
 
-app.post("/login", (req, res) => {
-  const email = req.body.email;
+app.post("/login", async (req, res) => {
+  const curremail = req.body.email;
   const password = req.body.password;
-  const user = USERS.find((x) => x.email === email);
+  const user = await USER.findOne({ email:curremail });
 
   if (!user) {
     return res.status(403).json({ msg: "User not found" });
