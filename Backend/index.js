@@ -1,30 +1,25 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-
-
-const mongoose = require('mongoose');
-const JWT_SECRET = "secret";
 const bodyParser = require("body-parser");
+
 var jsonParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+// var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const cors = require("cors");
 app.use(cors());
 app.use(jsonParser);
-const { v4: uniqueid } = require('uuid');
 
 
+const logsignroute = require("./Routes/users")
 const sumissionrouter = require("./Routes/submits")
-const {connectmongodb} = require('./connection')
+
+
 // connection
+const {connectmongodb} = require('./connection')
 connectmongodb('mongodb://127.0.0.1:27017/meetcodedb');
 
 
-// mongoose.connect('mongodb://127.0.0.1:27017/meetcodedb')
-// .then(() => console.log('Connected to MongoDB') )
-// .catch(error => {
-//   console.error('Error:', error);
-// });
+
 
 
 const PROBLEMS = [
@@ -183,24 +178,6 @@ const PROBLEMS = [
 ];
 
 
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  userId: {
-    type: String,
-    unique: true,
-    index: true,
-    required: true,
-    default: uniqueid
-  } 
-})
-
-// Define the schema
-
-
-// Create the model
-
-const USER = mongoose.model('Users',userSchema);
 
 
 
@@ -209,6 +186,7 @@ app.get("/", (req, res) => {
     msg: "hello world",
   });
 });
+
 
 app.get("/problems", (req, res) => {
   const filteredProblems = PROBLEMS.map((x) => ({
@@ -239,105 +217,12 @@ app.get("/problem/:id", (req, res) => {
 
 
 
-// app.get("/me", auth, async  (req, res) => {
-//   const user =  await USER.findOne({ userId: req.userId });
-//   res.json({ email: user.email, id: user.id });
-// });
-
-// app.get("/submissions/:pid", auth, async (req, res) => {
-//   const problemId = req.params.pid;
-//   var filteredsubmissions = [];
-//   try{
-//     filteredsubmissions = await SUBMISSION.find({ userId: req.userId, probId: problemId });
-//   } catch (error) {
-//     console.error('Error while fetching submissions:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-//   res.json({
-//     filteredsubmissions,
-//   });
-// });
-
-app.use("/submission", sumissionrouter)
-
-// app.post("/submission", auth, (req, res) => {
-//   const isCorrect = Math.random() < 0.5;
-//   const problemId = req.body.probId;
-//   const submission = req.body.submission;
-//   const time = req.body.subtime;
-//   var submissionStatus = isCorrect ? "AC" : "WA";
-
-//   var newSubmisson = new SUBMISSION({
-//     submission : submission,
-//     probId : problemId,
-//     userId: req.userId,
-//     status: submissionStatus,
-//     subtime : time,
-//   });;
-
-//   try{
-//     newSubmisson.save();
-//   }
-//   catch (error) {
-//     console.error('Error while saving submission in db:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-
-//   return res.json({
-//     status: submissionStatus,
-//   });
-
-  
-// });
+// routes
+app.use("/submission", sumissionrouter);
+app.use("/",logsignroute);
 
 
-//Routes
-app.post("/signup", async (req, res) => {
 
-  const curremail = req.body.email;
-  const password = req.body.password;
-
-  try {
-    // Check if the email already exists
-    const existingUser = await USER.findOne({ email:curremail });
-
-    if (existingUser) {
-      return res.status(403).json({ msg: 'Email already exists' });
-    }
-
-    // Create a new user
-    const newUser = new USER({ email : curremail, password : password });
-    await newUser.save();
-
-    return res.json({ msg: 'Success' });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    return res.status(500).json({ msg: 'Internal Server Error' });
-  }
-
-});
-
-app.post("/login", async (req, res) => {
-  const curremail = req.body.email;
-  const password = req.body.password;
-  const user = await USER.findOne({ email:curremail });
-
-  if (!user) {
-    return res.status(403).json({ msg: "User not found" });
-  }
-
-  if (user.password !== password) {
-    return res.status(403).json({ msg: "Incorrect password" });
-  }
-
-  const token = jwt.sign(
-    {
-      id: user.id,
-    },
-    JWT_SECRET
-  );
-  return res.json({ token });
-});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
