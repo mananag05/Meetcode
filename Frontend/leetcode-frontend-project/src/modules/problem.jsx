@@ -63,7 +63,7 @@ function Problem(){
       }
 
       const handlesubmissions = async () => {
-            const getsub = await fetch(`${backendurl}/submissions/${pid}`,{
+            const getsub = await fetch(`${backendurl}/submission/${pid}`,{
                 method : "GET",
                 headers : {
                     "authorisation" : localStorage.getItem("Authtoken")
