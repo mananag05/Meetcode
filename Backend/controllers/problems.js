@@ -66,8 +66,15 @@ async function createproblem(req,res){
       });
 }
 
+async function createauth(){
+
+
+
+}
+
 module.exports = {
     getallprobs,
     getspecprob,
     createproblem,
+    createauth,
 }

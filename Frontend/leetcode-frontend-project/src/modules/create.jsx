@@ -3,6 +3,33 @@ import Navbar from "./Explore";
 import './modules css/create.css';
 function Create() {
 
+  const [createauth , setcreateauth] = useState(false);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await fetch("http://localhost:3000/problems/create/auth", {
+  //         method: 'GET',
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "authcreate": localStorage.getItem("authcreate"),
+  //         },
+  //       });
+  //       if (res.ok) {
+  //         setCreateAuth(true);
+  //       } else {
+  //         setCreateAuth(false);
+  //         console.error('Error:', res.statusText);
+  //       }
+  //     } catch (error) {
+  //       setCreateAuth(false);
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
+  
+
     const [formData, setFormData] = useState({
         problemId: '',
         title: '',
@@ -22,12 +49,12 @@ function Create() {
         const responsee = await fetch("http://localhost:3000/problems/create",{
             method : 'POST',
             headers: {
+                'createauth': localStorage.getItem("createauth"),
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(formData),
         })
         const json = await responsee.json();
-        
     }
     
 
