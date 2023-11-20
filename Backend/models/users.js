@@ -9,10 +9,20 @@ const userSchema = new mongoose.Schema({
       unique: true,
       index: true,
       required: true,
-      default: uniqueid
+      default : uniqueid
     } 
   })
+
+const roleschema = new mongoose.Schema({
+    userid : String,
+    roles: {
+      type: [String], // specifying that roles should be an array of strings
+      default: []     // we can set a default value if needed
+  }
+})
   
+  
+  const ROLES = mongoose.model('Roles',roleschema);
   const USER = mongoose.model('Users',userSchema);
   
   module.exports = USER;

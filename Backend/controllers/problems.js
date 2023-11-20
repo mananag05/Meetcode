@@ -1,4 +1,8 @@
-const PROBLEMS = require("../models/problems")
+const PROBLEMS = require("../models/problems");
+const USER = require("../models/users");
+const ROLES = require("../models/users");
+const JWT_CREATE = "create";
+var jwt = require('jsonwebtoken');
 
 async function getallprobs(req,res){
 
@@ -42,6 +46,7 @@ async function createproblem(req,res){
     var desc = req.body.description;
     var examin = req.body.exampleIn;
     var examout = req.body.exampleOut;
+    try{
 
     var newprob = new PROBLEMS({
         problemId: probId,
@@ -53,7 +58,6 @@ async function createproblem(req,res){
         exampleOut: examout,
     })
 
-    try{
         newprob.save();
       }
       catch (error) {
@@ -66,10 +70,27 @@ async function createproblem(req,res){
       });
 }
 
-async function createauth(){
+    async function createauth(req,res){
+        var userid = req.userId;
+        var usersecret = req.body.secret;
 
-
-
+        try{
+            var curuser = await USER.findOne({userId : userid})
+            curusermail = curuser.email;
+        
+            if(curusermail.includes("admin") && usersecret === JWT_CREATE){
+                const token = jwt.sign({
+                  id : userid,
+                  mail : curusermail,
+                },JWT_CREATE);
+                return res.status(200).json({ token });
+            }
+        } catch (error) {
+            console.error("an unexpected error occured", error);
+            res.status(500).json({error : "Internal Server Error"});
+        }
+        
+       
 }
 
 module.exports = {
