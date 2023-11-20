@@ -12,7 +12,7 @@ function Problem(){
 
     // initial problem load
     const init = async () => {
-        const response = await fetch(`${backendurl}/problem/${pid}`,{
+        const response = await fetch(`${backendurl}/problems/${pid}`,{
             method : 'GET',
         })
 

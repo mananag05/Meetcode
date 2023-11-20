@@ -8,7 +8,7 @@ import './modules css/problems.css';
 function Problems() {
   const [problems, setProblems] = useState([]);
   const init = async () => {
-    const response = await fetch("http://localhost:3000/problems", {
+    const response = await fetch("http://localhost:3000/problems/all", {
       method: "GET",
     });
     const json = await response.json();
@@ -71,7 +71,7 @@ const getdifficulty = (curprob) => {
 function Formatproblems(props) {
   return props.problems.slice(props.load-4,props.load+1).map((curprob) => (
     <tr key={curprob.problemId}>
-        <td><Link className="specprob" to={`/problem/${curprob.problemId}`}>{curprob.title}</Link></td>
+        <td><Link className="specprob" to={`/problems/${curprob.problemId}`}>{curprob.title}</Link></td>
       <td className={getdifficulty(curprob.difficulty)}>
         {curprob.difficulty}
       </td>
