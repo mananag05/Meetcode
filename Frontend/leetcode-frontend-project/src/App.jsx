@@ -4,7 +4,7 @@ import Problem from './modules/problem';
 import Problems from './modules/problems';
 import './App.css'
 import Navbar from './modules/Explore';
-
+import Create from './modules/create';
 
   
 
@@ -19,8 +19,9 @@ function App() {
         <Routes>
             <Route path="/Explore" element={<Navbar />}/>
             <Route path="auth" element={<Loginout />}/>
-            <Route path="problem/:pid" element={<Problem />}/>
+            <Route path="problems/:pid" element={<Problem />}/>
             <Route path="/problems/all" element={<Problems />}/>
+            <Route path="/problems/create" element={<Create />}/>
         </Routes>
   </BrowserRouter>
   )

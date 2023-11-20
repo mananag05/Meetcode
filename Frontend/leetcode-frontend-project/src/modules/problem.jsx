@@ -12,7 +12,7 @@ function Problem(){
 
     // initial problem load
     const init = async () => {
-        const response = await fetch(`${backendurl}/problem/${pid}`,{
+        const response = await fetch(`${backendurl}/problems/${pid}`,{
             method : 'GET',
         })
 
@@ -63,7 +63,7 @@ function Problem(){
       }
 
       const handlesubmissions = async () => {
-            const getsub = await fetch(`${backendurl}/submissions/${pid}`,{
+            const getsub = await fetch(`${backendurl}/submission/${pid}`,{
                 method : "GET",
                 headers : {
                     "authorisation" : localStorage.getItem("Authtoken")
