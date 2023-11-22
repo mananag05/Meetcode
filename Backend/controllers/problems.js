@@ -1,7 +1,6 @@
 const PROBLEMS = require("../models/problems");
 const USER = require("../models/users");
-const ROLES = require("../models/users");
-const JWT_CREATE = "create";
+const JWT_CREATE = process.env.JWT_CREATE_SECRET_KEY;
 var jwt = require('jsonwebtoken');
 
 async function getallprobs(req,res){
@@ -46,6 +45,12 @@ async function createproblem(req,res){
     var desc = req.body.description;
     var examin = req.body.exampleIn;
     var examout = req.body.exampleOut;
+
+
+     if (!probId || !curtitle || !diff || !accept || !desc || !examin || !examout) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
     try{
 
     var newprob = new PROBLEMS({

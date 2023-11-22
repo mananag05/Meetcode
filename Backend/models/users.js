@@ -13,16 +13,6 @@ const userSchema = new mongoose.Schema({
     } 
   })
 
-const roleschema = new mongoose.Schema({
-    userid : String,
-    roles: {
-      type: [String], // specifying that roles should be an array of strings
-      default: []     // we can set a default value if needed
-  }
-})
-  
-  
-  const ROLES = mongoose.model('Roles',roleschema);
   const USER = mongoose.model('Users',userSchema);
   
   module.exports = USER;

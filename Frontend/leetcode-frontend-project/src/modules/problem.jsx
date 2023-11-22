@@ -112,8 +112,8 @@ function Problem(){
                         </tr>
                     </thead>
                     <tbody>
-                        {subms.map((cursub) => (
-                            <tr>
+                        {subms.map((cursub,index) => (
+                            <tr key={index}>
                                 <td className={`${cursub.status}`}>{cursub.status}</td>
                                 <td>{cursub.subtime}</td>
                             </tr>

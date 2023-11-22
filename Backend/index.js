@@ -6,7 +6,7 @@ var jsonParser = bodyParser.json();
 const cors = require("cors");
 app.use(cors());
 app.use(jsonParser);
-
+require("dotenv").config();
 
 const logsignroute = require("./Routes/users")
 const sumissionrouter = require("./Routes/submits")
@@ -14,7 +14,7 @@ const problemrouter = require("./Routes/problems")
 
 // connection
 const {connectmongodb} = require('./connection')
-connectmongodb('mongodb://127.0.0.1:27017/meetcodedb');
+connectmongodb(`mongodb+srv://${process.env.USER_API_USER}:${process.env.USER_API_KEY}@cluster.tfhewau.mongodb.net/?retryWrites=true&w=majority`);
 
 // routes
 app.use("/submission", sumissionrouter);

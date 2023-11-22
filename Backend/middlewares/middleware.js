@@ -1,4 +1,4 @@
-const JWT_SECRET = "secret";
+const JWT_SECRET = process.env.SECRETKEY_AUTH_KEY;
 var jwt = require('jsonwebtoken');
 
 
@@ -18,10 +18,8 @@ module.exports = {
     },
 
     checkcreate : (req, res, next) => {
-        console.log("initalised");
         const authHeader = req.headers["createauth"]; 
         if (authHeader === "null"){
-            console.log("missing")
           return res.status(403).json({ msg: "missing createauth" });
         }
        

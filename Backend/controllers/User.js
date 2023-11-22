@@ -1,5 +1,5 @@
 const USER = require("../models/users");
-const JWT_SECRET = "secret";
+const JWT_SECRET = process.env.SECRETKEY_AUTH_KEY;
 var jwt = require('jsonwebtoken');
 
 async function signup (req,res){
